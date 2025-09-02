@@ -16,5 +16,7 @@ void main(void)
 	printf("Valor 2: ");
 	scanf("%f", &v2);
 	soma = v1 + v2;
-	printf("\n A soma dos valores �: %f", soma);
+	printf("\n A soma dos valores é: %f\n", soma);
+	printf("\n A substração dos valores é: %f\n", v1 - v2);
+	printf("\n A multiplicação dos valores é: %f\n", v1 * v2);
 }
