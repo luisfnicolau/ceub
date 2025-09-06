@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luis Felipe Nicolau - Portfólio Digital</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #667eea;
+        }
+
+        main {
+            margin-top: 80px;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            margin: 2rem 0;
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+
+        .profile-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 4rem 3rem;
+        }
+
+        .profile-photo {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            margin: 0 auto 2rem;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .profile-photo:hover {
+            transform: scale(1.05);
+        }
+
+        .profile-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .profile-section h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .profile-section .subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .profile-section p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            text-align: justify;
+        }
+
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .contact-item a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .contact-item a:hover {
+            text-decoration: underline;
+        }
+
+        .experience-item {
+            border-left: 4px solid #667eea;
+            padding-left: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .experience-item::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            background: #667eea;
+            border-radius: 50%;
+        }
+
+        .experience-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .experience-company {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .experience-period {
+            font-style: italic;
+            color: #888;
+            margin-bottom: 1rem;
+        }
+
+        .experience-description {
+            line-height: 1.7;
+        }
+
+        .project-card {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border-left: 5px solid #667eea;
+        }
+
+        .project-title {
+            font-size: 1.5rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .project-description {
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .project-features {
+            list-style: none;
+        }
+
+        .project-features li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .project-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .skill-category {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 10px;
+            border-top: 4px solid #667eea;
+        }
+
+        .skill-category h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .skill-category p {
+            line-height: 1.7;
+        }
+
+        .testimonial {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border-left: 5px solid #667eea;
+            position: relative;
+        }
+
+        .testimonial::before {
+            content: '"';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            font-size: 4rem;
+            color: #667eea;
+            opacity: 0.3;
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .testimonial-author {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .testimonial-role {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .profile-section h1 {
+                font-size: 2rem;
+            }
+
+            .profile-photo {
+                width: 150px;
+                height: 150px;
+            }
+
+            .contact-info {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .section {
+                padding: 2rem 1rem;
+            }
+
+            .skills-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .scroll-indicator {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            z-index: 1000;
+        }
+
+        .scroll-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .scroll-dot.active {
+            background: #667eea;
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo">Luis Felipe Nicolau</div>
+            <ul class="nav-links">
+                <li><a href="#perfil">Perfil</a></li>
+                <li><a href="#curriculo">Currículo</a></li>
+                <li><a href="#projetos">Projetos</a></li>
+                <li><a href="#habilidades">Habilidades</a></li>
+                <li><a href="#recomendacoes">Recomendações</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Perfil Pessoal -->
+        <section id="perfil" class="section profile-section">
+            <div class="container">
+                <div class="profile-photo">
+                    <img src="https://raw.githubusercontent.com/luisfnicolau/ceub/cca717d69eb406378b2b05dba1b8f02d52ea7299/PersonalPhoto.png" alt="Luis Felipe Nicolau - Foto de Perfil" />
+                </div>
+                <h1>Luis Felipe Moraes Nicolau</h1>
+                <p class="subtitle">Engenheiro de Software e Empreendedor</p>
+                
+                <p>
+                    Sou Luis Felipe Moraes Nicolau, engenheiro de software full-stack e especialista em
+                    inteligência artificial, com mais de dez anos de experiência no desenvolvimento de soluções
+                    escaláveis, seguras e inovadoras. Atuei na fundação e liderança de startups de grande
+                    impacto, como a Jovens Gênios, plataforma de EdTech que alcançou mais de 100 mil
+                    usuários e foi avaliada em mais de R$ 100 milhões.
+                </p>
+
+                <p>
+                    Minha trajetória inclui o desenvolvimento de sistemas em fintechs e legaltechs, sempre
+                    com foco na aplicação prática da IA generativa e LLMs, arquitetura em nuvem e
+                    metodologias ágeis. Já liderei times multidisciplinares, implementei processos de DevOps e
+                    entreguei soluções que uniram tecnologia de ponta a resultados concretos para empresas e
+                    usuários.
+                </p>
+
+                <p>
+                    Além da experiência profissional, sou um entusiasta da programação: passo parte do meu
+                    tempo livre pesquisando novas tecnologias, escrevendo código por diversão e publicando
+                    aplicativos e sites autorais. Esse hábito reforça minha curiosidade e paixão contínua por
+                    aprender e criar.
+                </p>
+
+                <p>
+                    Sou movido pelo desafio de transformar dados e algoritmos em produtos reais, capazes de
+                    gerar valor, melhorar experiências e apoiar decisões estratégicas. Meu objetivo é seguir
+                    ampliando o impacto da tecnologia na vida das pessoas, com inovação, visão
+                    empreendedora e compromisso com a qualidade.
+                </p>
+
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <span>📧</span>
+                        <a href="mailto:luisfnicolau@gmail.com">luisfnicolau@gmail.com</a>
+                    </div>
+                    <div class="contact-item">
+                        <span>💼</span>
+                        <a href="https://www.linkedin.com/in/luis-felipe-nicolau/" target="_blank">LinkedIn</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Currículo -->
+        <section id="curriculo" class="section">
+            <div class="container">
+                <h2>Currículo</h2>
+                
+                <div class="experience-item">
+                    <div class="experience-title">Diretor de Tecnologia & Produto</div>
+                    <div class="experience-company">EcoDoctor, Manaus</div>
+                    <div class="experience-period">Julho 2023 – Maio 2025</div>
+                    <div class="experience-description">
+                        <p>Concepção, desenvolvimento e escalonamento de uma plataforma fintech em nuvem,
+                        movimentando mais de R$ 5 milhões em transações no primeiro ano.</p>
+                        
+                        <p>Implementação de ferramentas baseadas em IA, incluindo verificação de identidade com
+                        reconhecimento de imagem e chatbot de atendimento ao cliente.</p>
+                        
+                        <p>Liderança de todo o ciclo de desenvolvimento, utilizando AWS ECS, RDS, Lambda, SQS e Terraform.</p>
+                        
+                        <p>Implantação de práticas DevOps, pipelines CI/CD e testes automatizados para garantir qualidade e
+                        segurança.</p>
+                        
+                        <p>Entrega de soluções financeiras voltadas ao setor da saúde, alinhando visão de negócio e tecnologia
+                        de ponta.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projetos Acadêmicos e Profissionais -->
+        <section id="projetos" class="section">
+            <div class="container">
+                <h2>Projetos Acadêmicos e Profissionais</h2>
+                
+                <div class="project-card">
+                    <h3 class="project-title">EcoDoctor</h3>
+                    <p class="project-description">
+                        EcoDoctor é um aplicativo voltado exclusivamente para médicos, com
+                        foco em gestão de escalas de plantão e adiantamento de honorários,
+                        oferecendo uma experiência ágil, prática e segura do começo ao fim:
+                    </p>
+                    
+                    <ul class="project-features">
+                        <li><strong>Adiantamento de recebíveis em até 24 horas:</strong> Os médicos podem antecipar seus pagamentos de plantões
+                        diretamente pelo app, sem depender de prazos longos ou burocracias
+                        financeiras.</li>
+                        
+                        <li><strong>Gestão financeira acessível e inteligente:</strong> A plataforma permite acompanhar os recebíveis e gerenciar
+                        transações com clareza, por meio de relatórios financeiros
+                        centralizados.</li>
+                        
+                        <li><strong>Integração com hospitais e processos simplificados:</strong> Se o hospital já for parceiro, a operação é automática; caso contrário,
+                        basta enviar a nota fiscal. Isso garante aprovação rápida e tranquila,
+                        com comunicação direta com o hospital.</li>
+                        
+                        <li><strong>Interface intuitiva focada no usuário:</strong> Desenvolvido com design centrado no médico, o app facilita a troca de
+                        plantões, acesso a escalas e controle financeiro de maneira clara e
+                        eficiente.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Habilidades e Competências -->
+        <section id="habilidades" class="section">
+            <div class="container">
+                <h2>Habilidades e Competências</h2>
+                
+                <div class="skills-grid">
+                    <div class="skill-category">
+                        <h3>Desenvolvimento Web Full-Stack & DevOps</h3>
+                        <p>Experiência sólida em arquitetura e desenvolvimento de soluções completas, desde
+                        o front-end até o back-end, com foco em desempenho, escalabilidade e segurança.
+                        Atuação também em DevOps, incluindo pipelines de CI/CD, monitoramento e
+                        automação de processos para garantir entregas ágeis e de alta qualidade.</p>
+                    </div>
+
+                    <div class="skill-category">
+                        <h3>Gestão de Times de Tecnologia e Produto</h3>
+                        <p>Liderança de equipes multidisciplinares, com experiência em formação,
+                        capacitação e coordenação de times de engenharia e produto. Atuação estratégica
+                        na definição de metas, priorização de entregas e alinhamento entre tecnologia e
+                        objetivos de negócio.</p>
+                    </div>
+
+                    <div class="skill-category">
+                        <h3>Planejamento Estratégico & Inovação</h3>
+                        <p>Capacidade de alinhar soluções tecnológicas a planos de crescimento empresarial,
+                        sempre com foco em gerar impacto real para usuários e organizações. Forte
+                        atuação em ambientes de startup, combinando visão empreendedora e
+                        metodologias ágeis.</p>
+                    </div>
+
+                    <div class="skill-category">
+                        <h3>Inteligência Artificial & LLMs</h3>
+                        <p>Especialização no uso de IA generativa, modelos de linguagem (LLMs) e
+                        arquiteturas de RAG (Retrieval-Augmented Generation) para criar soluções
+                        inovadoras em setores como educação, saúde e jurídico.</p>
+                    </div>
+
+                    <div class="skill-category">
+                        <h3>Cloud Computing & Infraestrutura</h3>
+                        <p>Proficiência em AWS (ECS, RDS, Lambda, SQS, EC2, MSK), Docker e Terraform para
+                        desenvolvimento de sistemas robustos em nuvem, com alta disponibilidade, custo
+                        otimizado e conformidade regulatória.</p>
+                    </div>
+
+                    <div class="skill-category">
+                        <h3>Banco de Dados & Análise de Dados</h3>
+                        <p>Experiência com PostgreSQL, MySQL, Neo4j e NoSQL, incluindo design de
+                        esquemas, otimização de queries e análise de dados para apoiar decisões e
+                        melhorar produtos.</p>
+                    </div>
+
+                    <div class="skill-category">
+                        <h3>Paixão pela Programação</h3>
+                        <p>Além da carreira profissional, dedico meu tempo livre a pesquisar novas tecnologias
+                        e desenvolver projetos pessoais por prazer, resultando em apps e sites publicados.
+                        Esse hábito mantém minhas habilidades atualizadas e reforça minha curiosidade e
+                        criatividade.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recomendações e Testemunhos -->
+        <section id="recomendacoes" class="section">
+            <div class="container">
+                <h2>Recomendações e Testemunhos</h2>
+                
+                <div class="testimonial">
+                    <div class="testimonial-text">
+                        "Sem você a Jovens Gênios não teria chegado até aqui"
+                    </div>
+                    <div class="testimonial-text">
+                        "Eu tinha uma ideia, e sei que o único que pode fazer é você"
+                    </div>
+                    <div class="testimonial-author">Fernando Costa</div>
+                    <div class="testimonial-role">Cofundador | CTO & CPO na Jovens Gênios</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add scroll effect to header
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 100) {
+                header.style.background = 'rgba(255, 255, 255, 0.98)';
+            } else {
+                header.style.background = 'rgba(255, 255, 255, 0.95)';
+            }
+        });
+
+        // Add animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all sections
+        document.querySelectorAll('.section').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(30px)';
+            section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>
