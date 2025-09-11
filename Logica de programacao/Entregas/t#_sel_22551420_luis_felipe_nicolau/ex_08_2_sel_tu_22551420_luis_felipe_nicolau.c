@@ -9,4 +9,15 @@
 
 void main(void) {
     setlocale(LC_ALL, "Portuguese");
+    
+    float valor;
+    printf("Digite o valor: ");
+    scanf("%f", &valor);
+    
+    printf("Valor: %.2f", valor);
+    if(valor >= 100) {
+    	printf("\nValor maior ou igual a cem.");
+	} else {
+		printf("\nValor menor que cem.");
+	}
 }
