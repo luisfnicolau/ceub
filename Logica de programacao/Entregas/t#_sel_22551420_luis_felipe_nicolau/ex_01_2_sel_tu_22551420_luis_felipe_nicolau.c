@@ -1,3 +1,9 @@
+/*
+ * DescriÃ§Ã£o: Calcula a idade do usuÃ¡rio baseado no ano de nascimento.
+ * Autor: Luis Felipe Nicolau
+ * Data: 11/09/2025
+ */
+
 #include <stdio.h>
 #include <locale.h>
 
@@ -16,12 +22,12 @@ void main(void) {
 	
 	idade = ano_atual - ano_nascimento;
 	
-	printf("\nSeu ano de nascimento é: %d", ano_nascimento);
-	printf("\nSua idade é: %d", idade);
+	printf("\nSeu ano de nascimento ï¿½: %d", ano_nascimento);
+	printf("\nSua idade ï¿½: %d", idade);
 	
 	if(idade >= 16){
-		printf("\nA idade é %d anos e já pode votar", idade);
+		printf("\nA idade ï¿½ %d anos e jï¿½ pode votar", idade);
 	} else {
-		printf("\nA idade é %d anos e não pode votar", idade);
+		printf("\nA idade ï¿½ %d anos e nï¿½o pode votar", idade);
 	}
 }

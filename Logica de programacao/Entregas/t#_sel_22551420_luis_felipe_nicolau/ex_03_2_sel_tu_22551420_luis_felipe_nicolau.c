@@ -1,3 +1,9 @@
+/*
+ * DescriÃ§Ã£o: Exibe se um dado numero Ã© positivo, negativo ou nulo.
+ * Autor: Luis Felipe Nicolau
+ * Data: 11/09/2025
+ */
+
 #include <stdio.h>
 #include <locale.h>
 
@@ -11,13 +17,13 @@ void main(void) {
 	
 	printf("\nValor digitado: %.2f", valor);
 	if (valor > 0) {
-		printf("\nNúmero positivo");
+		printf("\nNï¿½mero positivo");
 		printf("\nDobro do valor: %.2f", valor * 2);
 	} else if (valor < 0) {
-		printf("\nNúmero negativo");
+		printf("\nNï¿½mero negativo");
 		printf("\nTriplo do valor: %.2f", valor * 3);
 	} else {
-		printf("\nNúmero nulo");
-		printf("\nValor da variável: %.2f", valor);
+		printf("\nNï¿½mero nulo");
+		printf("\nValor da variï¿½vel: %.2f", valor);
 	}
 }

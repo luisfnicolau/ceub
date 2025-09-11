@@ -1,3 +1,9 @@
+/*
+ * DescriÃ§Ã£o: Exibe qual o valor maior dentro dois valores.
+ * Autor: Luis Felipe Nicolau
+ * Data: 11/09/2025
+ */
+ 
 #include <stdio.h>
 #include <locale.h>
 
@@ -15,15 +21,15 @@ void main(void) {
 	scanf("%f", &valor_2);
 	
 	if(valor_1 > valor_2) {
-		printf("\nO primeiro valor é maior", valor_1);
+		printf("\nO primeiro valor ï¿½ maior", valor_1);
 		printf("\nMaior valor: %f", valor_1);
 		printf("\nMenor valor: %f", valor_2);
 	} else if (valor_1 < valor_2) {
-		printf("\nO segundo valor é maior: %f", valor_2);
+		printf("\nO segundo valor ï¿½ maior: %f", valor_2);
 		printf("\nMaior valor: %f", valor_2);
 		printf("\nMenor valor: %f", valor_1);
 	} else {
-		printf("\nOs valores são iguais");
+		printf("\nOs valores sï¿½o iguais");
 		printf("\nValor: %f", valor_1);
 	}
 }
