@@ -1,3 +1,9 @@
+/*
+Autor: Luis Felipe Moraes Nicolau
+Data: 24/09/2025
+Calcula a média de N números reais
+*/
+
 #include <stdio.h>
 #include <locale.h>
 #define FLOAT "%f" 
