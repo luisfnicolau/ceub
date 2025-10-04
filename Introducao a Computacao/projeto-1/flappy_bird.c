@@ -9,15 +9,15 @@
 // Configurações do jogo
 #define LARGURA_TELA 80
 #define ALTURA_TELA 20
-#define GRAVIDADE 1
-#define IMPULSO -2
+#define GRAVIDADE 0.5
+#define IMPULSO -1
 #define LARGURA_OBSTACULO 4
 #define VELOCIDADE_JOGO 1
 
 // Estruturas
 typedef struct {
     int x, y;
-    int velocidade;
+    float velocidade;
 } Passaro;
 
 typedef struct {
