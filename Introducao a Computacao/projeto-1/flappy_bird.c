@@ -336,19 +336,25 @@ void atualizar_obstaculos() {
             passaro_bottom = passaro.y + 1;
         }
         
-        // Verificar se há sobreposição horizontal
-        if (passaro_right >= obstaculos[i].x && passaro_left < obstaculos[i].x + LARGURA_OBSTACULO) {
-            // Verificar colisão com obstáculo superior
+        // Verificar se há sobreposição horizontal (com margem de segurança nas bordas)
+        int margem_seguranca = 1; // Margem de 1 caractere nas bordas dos obstáculos
+        int obstaculo_left = obstaculos[i].x + margem_seguranca;
+        int obstaculo_right = obstaculos[i].x + LARGURA_OBSTACULO - margem_seguranca;
+        
+        if (passaro_right >= obstaculo_left && passaro_left < obstaculo_right) {
+            // Verificar colisão com obstáculo superior (ignorando bordas)
             // Obstáculo superior ocupa de y=1 até y=altura_superior-1
-            // Colisão se: passaro_bottom >= 1 E passaro_top < altura_superior
-            if (passaro_bottom >= 1 && passaro_top < obstaculos[i].altura_superior) {
+            // Colisão se: passaro_bottom >= 1 E passaro_top < altura_superior (com margem)
+            int altura_superior_com_margem = obstaculos[i].altura_superior - margem_seguranca;
+            if (passaro_bottom >= 1 + margem_seguranca && passaro_top < altura_superior_com_margem) {
                 game_over = 1;
             }
-            // Verificar colisão com obstáculo inferior
+            // Verificar colisão com obstáculo inferior (ignorando bordas)
             // Obstáculo inferior ocupa de y=ALTURA_TELA-altura_inferior até y=ALTURA_TELA-2
-            // Colisão se: passaro_top < ALTURA_TELA-1 E passaro_bottom >= obstaculo_inferior_top
+            // Colisão se: passaro_top < ALTURA_TELA-1 E passaro_bottom >= obstaculo_inferior_top (com margem)
             int obstaculo_inferior_top = ALTURA_TELA - obstaculos[i].altura_inferior;
-            if (passaro_top < ALTURA_TELA-1 && passaro_bottom >= obstaculo_inferior_top) {
+            int obstaculo_inferior_top_com_margem = obstaculo_inferior_top + margem_seguranca;
+            if (passaro_top < ALTURA_TELA-1 - margem_seguranca && passaro_bottom >= obstaculo_inferior_top_com_margem) {
                 game_over = 1;
             }
         }
