@@ -15,6 +15,7 @@
 #define VELOCIDADE_JOGO 0.5
 #define FPS_DELAY 33333  // Microssegundos (33ms = 30 FPS)
 #define PONTUACAO_PARA_PROXIMO_NIVEL 1
+#define MODO_INVENCIVEL 0  // Ativar modo invencível para testes
 
 // Estruturas
 typedef struct {
@@ -335,6 +336,7 @@ void atualizar_passaro() {
     passaro.y += passaro.velocidade;
     
     // Verificar colisões com bordas (hitbox baseada no nível de evolução)
+#if !MODO_INVENCIVEL
     if (passaro.nivel_evolucao == 0) {
         // Nível 0: Apenas um # (1x1)
         if (passaro.y <= 0 || passaro.y >= ALTURA_TELA-1) {
@@ -356,6 +358,7 @@ void atualizar_passaro() {
             game_over = 1;
         }
     }
+#endif
 }
 
 void atualizar_obstaculos() {
@@ -423,14 +426,18 @@ void atualizar_obstaculos() {
             // Obstáculo superior vai de y=1 até y=altura_superior-1
             // Colisão apenas se o pássaro está realmente tocando o obstáculo
             if (passaro_bottom >= 1 && passaro_top <= obstaculos[i].altura_superior - 1) {
+#if !MODO_INVENCIVEL
                 game_over = 1;
+#endif
             }
             // Verificar colisão com obstáculo inferior
             // Obstáculo inferior vai de y=ALTURA_TELA-altura_inferior até y=ALTURA_TELA-2
             // Colisão apenas se o pássaro está realmente tocando o obstáculo
             int obstaculo_inferior_top = ALTURA_TELA - obstaculos[i].altura_inferior;
             if (passaro_top <= ALTURA_TELA - 2 && passaro_bottom >= obstaculo_inferior_top) {
+#if !MODO_INVENCIVEL
                 game_over = 1;
+#endif
             }
         }
     }
@@ -438,8 +445,12 @@ void atualizar_obstaculos() {
 
 void desenhar_interface() {
     // Desenhar pontuação e nível de evolução
-    char pontuacao_str[30];
+    char pontuacao_str[50];
+#if MODO_INVENCIVEL
+    snprintf(pontuacao_str, sizeof(pontuacao_str), "Score: %d | Nivel: %d | [INVENCIVEL]", pontuacao, passaro.nivel_evolucao);
+#else
     snprintf(pontuacao_str, sizeof(pontuacao_str), "Score: %d | Nivel: %d", pontuacao, passaro.nivel_evolucao);
+#endif
     
     int len = strlen(pontuacao_str);
     int start_x = (LARGURA_TELA - len) / 2;
