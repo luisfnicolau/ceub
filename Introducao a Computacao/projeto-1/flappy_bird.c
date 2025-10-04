@@ -14,11 +14,14 @@
 #define LARGURA_OBSTACULO 4
 #define VELOCIDADE_JOGO 0.5
 #define FPS_DELAY 33333  // Microssegundos (33ms = 30 FPS)
+#define PONTUACAO_PARA_PROXIMO_NIVEL 1
 
 // Estruturas
 typedef struct {
     int x, y;
     float velocidade;
+    char desenho[3][6];  // Desenho ASCII do pássaro (3 linhas x 6 colunas)
+    int nivel_evolucao;  // Nível de evolução baseado na pontuação
 } Passaro;
 
 typedef struct {
@@ -111,18 +114,115 @@ void desenhar_borda() {
     }
 }
 
+void inicializar_desenho_passaro() {
+    // Limpar desenho inicial
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 6; j++) {
+            passaro.desenho[i][j] = ' ';
+        }
+    }
+    
+    // Nível 0: #
+    passaro.desenho[1][2] = '#';
+    passaro.nivel_evolucao = 0;
+}
+
+void atualizar_desenho_passaro() {
+    int novo_nivel = pontuacao / PONTUACAO_PARA_PROXIMO_NIVEL;  // Novo nível baseado na pontuação
+    
+    if (novo_nivel != passaro.nivel_evolucao) {
+        passaro.nivel_evolucao = novo_nivel;
+        
+        // Limpar desenho anterior
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 6; j++) {
+                passaro.desenho[i][j] = ' ';
+            }
+        }
+        
+        // Evolução baseada no nível
+        if (passaro.nivel_evolucao >= 0) {  // Nível 0: #
+            passaro.desenho[1][2] = '#';
+        }
+        if (passaro.nivel_evolucao >= 1) {  // Nível 1: ##
+            passaro.desenho[1][2] = '#';
+            passaro.desenho[1][3] = '#';
+        }
+        if (passaro.nivel_evolucao >= 2) {  // Nível 2: ###
+            passaro.desenho[1][2] = '#';
+            passaro.desenho[1][3] = '#';
+            passaro.desenho[1][4] = '#';
+        }
+        if (passaro.nivel_evolucao >= 3) {  // Nível 3: ### + #
+            passaro.desenho[1][2] = '#';
+            passaro.desenho[1][3] = '#';
+            passaro.desenho[1][4] = '#';
+            passaro.desenho[0][2] = '#';
+        }
+        if (passaro.nivel_evolucao >= 4) {  // Nível 4: ### + ##
+            passaro.desenho[1][2] = '#';
+            passaro.desenho[1][3] = '#';
+            passaro.desenho[1][4] = '#';
+            passaro.desenho[0][2] = '#';
+            passaro.desenho[0][3] = '#';
+        }
+        if (passaro.nivel_evolucao >= 5) {  // Nível 5: ### + ###
+            passaro.desenho[1][2] = '#';
+            passaro.desenho[1][3] = '#';
+            passaro.desenho[1][4] = '#';
+            passaro.desenho[0][2] = '#';
+            passaro.desenho[0][3] = '#';
+            passaro.desenho[0][4] = '#';
+        }
+        if (passaro.nivel_evolucao >= 6) {  // Nível 6: #### + ###
+            passaro.desenho[1][1] = '#';
+            passaro.desenho[1][2] = '#';
+            passaro.desenho[1][3] = '#';
+            passaro.desenho[1][4] = '#';
+            passaro.desenho[0][2] = '#';
+            passaro.desenho[0][3] = '#';
+            passaro.desenho[0][4] = '#';
+        }
+        if (passaro.nivel_evolucao >= 7) {  // Nível 7: #### + # + ###
+            passaro.desenho[1][1] = '#';
+            passaro.desenho[1][2] = '#';
+            passaro.desenho[1][3] = '#';
+            passaro.desenho[1][4] = '#';
+            passaro.desenho[0][0] = '#';
+            passaro.desenho[2][2] = '#';
+            passaro.desenho[2][3] = '#';
+            passaro.desenho[2][4] = '#';
+        }
+        if (passaro.nivel_evolucao >= 8) {  // Nível 8: #### + ## + ###
+            passaro.desenho[1][1] = '#';
+            passaro.desenho[1][2] = '#';
+            passaro.desenho[1][3] = '#';
+            passaro.desenho[1][4] = '#';
+            passaro.desenho[0][0] = '#';
+            passaro.desenho[0][1] = '#';
+            passaro.desenho[2][2] = '#';
+            passaro.desenho[2][3] = '#';
+            passaro.desenho[2][4] = '#';
+        }
+    }
+}
+
 void inicializar_jogo() {
     // Inicializar pássaro
     passaro.x = 10;
     passaro.y = ALTURA_TELA / 2;
     passaro.velocidade = 0;
+    inicializar_desenho_passaro();
     
     // Inicializar obstáculos
     srand(time(NULL));
     for (int i = 0; i < 3; i++) {
         obstaculos[i].x = LARGURA_TELA + (i * 25);
-        obstaculos[i].altura_superior = rand() % (ALTURA_TELA - 8) + 3;
-        obstaculos[i].altura_inferior = ALTURA_TELA - obstaculos[i].altura_superior - 4;
+        // Garantir que sempre há um espaço de 8 linhas entre os obstáculos
+        int espaco_obstaculos = 8;
+        int altura_maxima_superior = ALTURA_TELA - espaco_obstaculos - 2; // -2 para bordas
+        obstaculos[i].altura_superior = rand() % altura_maxima_superior + 1;
+        obstaculos[i].altura_inferior = ALTURA_TELA - obstaculos[i].altura_superior - espaco_obstaculos;
         obstaculos[i].passou = 0;
     }
     
@@ -131,9 +231,18 @@ void inicializar_jogo() {
 }
 
 void desenhar_passaro() {
-    if (passaro.y >= 1 && passaro.y < ALTURA_TELA-1 && 
-        passaro.x >= 1 && passaro.x < LARGURA_TELA-1) {
-        tela.buffer[passaro.y][passaro.x] = '#';
+    // Desenhar o pássaro completo (3x6)
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 6; j++) {
+            int y = passaro.y - 1 + i;  // Centralizar verticalmente
+            int x = passaro.x - 2 + j;  // Centralizar horizontalmente
+            
+            if (y >= 1 && y < ALTURA_TELA-1 && 
+                x >= 1 && x < LARGURA_TELA-1 && 
+                passaro.desenho[i][j] != ' ') {
+                tela.buffer[y][x] = passaro.desenho[i][j];
+            }
+        }
     }
 }
 
@@ -166,9 +275,17 @@ void atualizar_passaro() {
     passaro.velocidade += GRAVIDADE;
     passaro.y += passaro.velocidade;
     
-    // Verificar colisões com bordas
-    if (passaro.y <= 0 || passaro.y >= ALTURA_TELA-1) {
-        game_over = 1;
+    // Verificar colisões com bordas (hitbox baseada no nível de evolução)
+    if (passaro.nivel_evolucao == 0) {
+        // Nível 0: Apenas um # (1x1)
+        if (passaro.y <= 0 || passaro.y >= ALTURA_TELA-1) {
+            game_over = 1;
+        }
+    } else {
+        // Níveis 1+: Pássaro completo (3x6)
+        if (passaro.y - 1 <= 0 || passaro.y + 1 >= ALTURA_TELA-1) {
+            game_over = 1;
+        }
     }
 }
 
@@ -194,15 +311,44 @@ void atualizar_obstaculos() {
         // Reposicionar obstáculo quando sair da tela
         if (obstaculos[i].x + LARGURA_OBSTACULO < 0) {
             obstaculos[i].x = LARGURA_TELA + 10;
-            obstaculos[i].altura_superior = rand() % (ALTURA_TELA - 8) + 3;
-            obstaculos[i].altura_inferior = ALTURA_TELA - obstaculos[i].altura_superior - 4;
+            // Manter o mesmo espaço de 8 linhas entre os obstáculos
+            int espaco_obstaculos = 8;
+            int altura_maxima_superior = ALTURA_TELA - espaco_obstaculos - 2; // -2 para bordas
+            obstaculos[i].altura_superior = rand() % altura_maxima_superior + 1;
+            obstaculos[i].altura_inferior = ALTURA_TELA - obstaculos[i].altura_superior - espaco_obstaculos;
             obstaculos[i].passou = 0;
         }
         
-        // Verificar colisão com pássaro
-        if (passaro.x >= obstaculos[i].x && passaro.x < obstaculos[i].x + LARGURA_OBSTACULO) {
-            if (passaro.y <= obstaculos[i].altura_superior || 
-                passaro.y >= ALTURA_TELA - obstaculos[i].altura_inferior) {
+        // Verificar colisão com pássaro (hitbox baseada no nível de evolução)
+        int passaro_left, passaro_right, passaro_top, passaro_bottom;
+        
+        if (passaro.nivel_evolucao == 0) {
+            // Nível 0: Apenas um # (1x1)
+            passaro_left = passaro.x;
+            passaro_right = passaro.x;
+            passaro_top = passaro.y;
+            passaro_bottom = passaro.y;
+        } else {
+            // Níveis 1+: Pássaro completo (3x6)
+            passaro_left = passaro.x - 2;
+            passaro_right = passaro.x + 3;
+            passaro_top = passaro.y - 1;
+            passaro_bottom = passaro.y + 1;
+        }
+        
+        // Verificar se há sobreposição horizontal
+        if (passaro_right >= obstaculos[i].x && passaro_left < obstaculos[i].x + LARGURA_OBSTACULO) {
+            // Verificar colisão com obstáculo superior
+            // Obstáculo superior ocupa de y=1 até y=altura_superior-1
+            // Colisão se: passaro_bottom >= 1 E passaro_top < altura_superior
+            if (passaro_bottom >= 1 && passaro_top < obstaculos[i].altura_superior) {
+                game_over = 1;
+            }
+            // Verificar colisão com obstáculo inferior
+            // Obstáculo inferior ocupa de y=ALTURA_TELA-altura_inferior até y=ALTURA_TELA-2
+            // Colisão se: passaro_top < ALTURA_TELA-1 E passaro_bottom >= obstaculo_inferior_top
+            int obstaculo_inferior_top = ALTURA_TELA - obstaculos[i].altura_inferior;
+            if (passaro_top < ALTURA_TELA-1 && passaro_bottom >= obstaculo_inferior_top) {
                 game_over = 1;
             }
         }
@@ -210,9 +356,9 @@ void atualizar_obstaculos() {
 }
 
 void desenhar_interface() {
-    // Desenhar pontuação
-    char pontuacao_str[20];
-    snprintf(pontuacao_str, sizeof(pontuacao_str), "Score: %d", pontuacao);
+    // Desenhar pontuação e nível de evolução
+    char pontuacao_str[30];
+    snprintf(pontuacao_str, sizeof(pontuacao_str), "Score: %d | Nivel: %d", pontuacao, passaro.nivel_evolucao);
     
     int len = strlen(pontuacao_str);
     int start_x = (LARGURA_TELA - len) / 2;
@@ -392,6 +538,7 @@ int main() {
         if (jogo_iniciado && !game_over) {
             atualizar_passaro();
             atualizar_obstaculos();
+            atualizar_desenho_passaro();
         }
         
         // Renderizar
