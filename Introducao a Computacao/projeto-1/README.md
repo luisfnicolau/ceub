@@ -81,11 +81,21 @@ Você pode modificar as seguintes constantes para personalizar o jogo:
 ```c
 #define LARGURA_TELA 80        // Largura da tela
 #define ALTURA_TELA 20         // Altura da tela
-#define GRAVIDADE 1            // Força da gravidade
-#define IMPULSO -3             // Força do pulo
-#define LARGURA_OBSTACULO 3    // Largura dos obstáculos
-#define VELOCIDADE_JOGO 1      // Velocidade do jogo
+#define GRAVIDADE 0.2          // Força da gravidade (valores menores = mais suave)
+#define IMPULSO -1             // Força do pulo (valores negativos)
+#define LARGURA_OBSTACULO 4    // Largura dos obstáculos
+#define VELOCIDADE_JOGO 0.5    // Velocidade do jogo (obstáculos se movem a cada 2 frames)
+#define FPS_DELAY 33333        // Delay entre frames (33ms = 30 FPS)
 ```
+
+### 🚀 Ajustes de Performance
+
+Para diferentes níveis de fluidez:
+
+- **30 FPS (Fluido)**: `FPS_DELAY 33333` (padrão atual)
+- **20 FPS (Equilibrado)**: `FPS_DELAY 50000`
+- **60 FPS (Muito fluido)**: `FPS_DELAY 16666` (pode ser muito rápido)
+- **10 FPS (Lento)**: `FPS_DELAY 100000`
 
 ## 🐛 Resolução de Problemas
 

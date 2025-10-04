@@ -9,10 +9,11 @@
 // Configurações do jogo
 #define LARGURA_TELA 80
 #define ALTURA_TELA 20
-#define GRAVIDADE 0.5
-#define IMPULSO -1
+#define GRAVIDADE 0.1
+#define IMPULSO -0.3
 #define LARGURA_OBSTACULO 4
-#define VELOCIDADE_JOGO 1
+#define VELOCIDADE_JOGO 0.5
+#define FPS_DELAY 33333  // Microssegundos (33ms = 30 FPS)
 
 // Estruturas
 typedef struct {
@@ -56,7 +57,7 @@ void restaurar_terminal() {
 }
 
 void limpar_tela() {
-    printf("\033[2J\033[H");
+    fputs("\033[2J\033[H", stdout);
     fflush(stdout);
 }
 
@@ -172,9 +173,18 @@ void atualizar_passaro() {
 }
 
 void atualizar_obstaculos() {
+    static int contador = 0;
+    contador++;
+    
+    // Mover obstáculos apenas a cada 2 frames (velocidade reduzida)
+    if (contador >= 2) {
+        contador = 0;
+        for (int i = 0; i < 3; i++) {
+            obstaculos[i].x -= 1;
+        }
+    }
+    
     for (int i = 0; i < 3; i++) {
-        obstaculos[i].x -= VELOCIDADE_JOGO;
-        
         // Verificar se passou do pássaro para pontuar
         if (obstaculos[i].x + LARGURA_OBSTACULO < passaro.x && !obstaculos[i].passou) {
             pontuacao++;
@@ -257,15 +267,28 @@ void desenhar_interface() {
                 tela.buffer[ALTURA_TELA/2 + 2][start_restart + i] = restart[i];
             }
         }
+        
+        char quit[] = "Pressione Q para sair";
+        int len_quit = strlen(quit);
+        int start_quit = (LARGURA_TELA - len_quit) / 2;
+        
+        for (int i = 0; i < len_quit; i++) {
+            if (start_quit + i < LARGURA_TELA-1) {
+                tela.buffer[ALTURA_TELA/2 + 4][start_quit + i] = quit[i];
+            }
+        }
     }
 }
 
 void renderizar_tela() {
     limpar_tela();
     
+    // Renderizar todas as linhas de uma vez para melhor performance
     for (int y = 0; y < ALTURA_TELA; y++) {
-        printf("%s\n", tela.buffer[y]);
+        fputs(tela.buffer[y], stdout);
+        fputs("\n", stdout);
     }
+    fflush(stdout);
 }
 
 int tecla_disponivel() {
@@ -349,7 +372,7 @@ int main() {
         desenhar_interface();
         renderizar_tela();
         
-        usleep(100000); // 100ms de delay
+        usleep(FPS_DELAY);
     }
     
     // Limpeza
