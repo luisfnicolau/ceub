@@ -223,25 +223,65 @@ void desenhar_interface() {
         }
     }
     
-    // Desenhar instruções
+    // Desenhar menu inicial
     if (!jogo_iniciado) {
-        char instrucao[] = "Pressione ESPACO para pular!";
-        int len_inst = strlen(instrucao);
-        int start_inst = (LARGURA_TELA - len_inst) / 2;
+        char titulo[] = "=== FLAPPY TERMINAL ===";
+        int len_titulo = strlen(titulo);
+        int start_titulo = (LARGURA_TELA - len_titulo) / 2;
         
-        for (int i = 0; i < len_inst; i++) {
-            if (start_inst + i < LARGURA_TELA-1) {
-                tela.buffer[ALTURA_TELA/2][start_inst + i] = instrucao[i];
+        for (int i = 0; i < len_titulo; i++) {
+            if (start_titulo + i < LARGURA_TELA-1) {
+                tela.buffer[4][start_titulo + i] = titulo[i];
             }
         }
         
-        char start[] = "Pressione ESPACO para iniciar!";
+        char controles1[] = "Controles:";
+        int len_cont1 = strlen(controles1);
+        int start_cont1 = (LARGURA_TELA - len_cont1) / 2;
+        
+        for (int i = 0; i < len_cont1; i++) {
+            if (start_cont1 + i < LARGURA_TELA-1) {
+                tela.buffer[6][start_cont1 + i] = controles1[i];
+            }
+        }
+        
+        char controles2[] = "ESPACO - Pular / Iniciar jogo";
+        int len_cont2 = strlen(controles2);
+        int start_cont2 = (LARGURA_TELA - len_cont2) / 2;
+        
+        for (int i = 0; i < len_cont2; i++) {
+            if (start_cont2 + i < LARGURA_TELA-1) {
+                tela.buffer[7][start_cont2 + i] = controles2[i];
+            }
+        }
+        
+        char controles3[] = "R - Reiniciar (apos game over)";
+        int len_cont3 = strlen(controles3);
+        int start_cont3 = (LARGURA_TELA - len_cont3) / 2;
+        
+        for (int i = 0; i < len_cont3; i++) {
+            if (start_cont3 + i < LARGURA_TELA-1) {
+                tela.buffer[8][start_cont3 + i] = controles3[i];
+            }
+        }
+        
+        char controles4[] = "Q - Sair (apos game over)";
+        int len_cont4 = strlen(controles4);
+        int start_cont4 = (LARGURA_TELA - len_cont4) / 2;
+        
+        for (int i = 0; i < len_cont4; i++) {
+            if (start_cont4 + i < LARGURA_TELA-1) {
+                tela.buffer[9][start_cont4 + i] = controles4[i];
+            }
+        }
+        
+        char start[] = "Pressione ESPACO para iniciar...";
         int len_start = strlen(start);
         int start_start = (LARGURA_TELA - len_start) / 2;
         
         for (int i = 0; i < len_start; i++) {
             if (start_start + i < LARGURA_TELA-1) {
-                tela.buffer[ALTURA_TELA/2 + 2][start_start + i] = start[i];
+                tela.buffer[11][start_start + i] = start[i];
             }
         }
     }
@@ -343,13 +383,7 @@ int main() {
     inicializar_tela();
     inicializar_jogo();
     
-    printf("=== FLAPPY BIRD - TERMINAL ===\n");
-    printf("Controles:\n");
-    printf("  ESPACO - Pular / Iniciar jogo\n");
-    printf("  R - Reiniciar (após game over)\n");
-    printf("  Q - Sair (após game over)\n");
-    printf("Pressione ESPACO para iniciar...\n");
-    sleep(3);
+    // Menu inicial será mostrado dentro do jogo
     
     // Loop principal do jogo
     while (1) {
