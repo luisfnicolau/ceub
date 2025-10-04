@@ -20,7 +20,7 @@
 typedef struct {
     int x, y;
     float velocidade;
-    char desenho[3][6];  // Desenho ASCII do pássaro (3 linhas x 6 colunas)
+    char desenho[4][6];  // Desenho ASCII do pássaro (4 linhas x 6 colunas)
     int nivel_evolucao;  // Nível de evolução baseado na pontuação
 } Passaro;
 
@@ -116,14 +116,14 @@ void desenhar_borda() {
 
 void inicializar_desenho_passaro() {
     // Limpar desenho inicial
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 6; j++) {
             passaro.desenho[i][j] = ' ';
         }
     }
     
-    // Nível 0: #
-    passaro.desenho[1][2] = '#';
+    // Nível 0: primeiro # da linha 3 (baixo)
+    passaro.desenho[3][1] = '#';
     passaro.nivel_evolucao = 0;
 }
 
@@ -134,75 +134,134 @@ void atualizar_desenho_passaro() {
         passaro.nivel_evolucao = novo_nivel;
         
         // Limpar desenho anterior
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 6; j++) {
                 passaro.desenho[i][j] = ' ';
             }
         }
         
-        // Evolução baseada no nível
-        if (passaro.nivel_evolucao >= 0) {  // Nível 0: #
-            passaro.desenho[1][2] = '#';
+        // Progressão:  ##>   (linha 0 - cima)
+        //              ###   (linha 1)  
+        //              ####  (linha 2)
+        //              ###   (linha 3 - baixo)
+        
+        // Desenhar de baixo para cima, esquerda para direita
+        if (passaro.nivel_evolucao >= 0) {   // Nível 0: primeiro # da linha 3 (baixo)
+            passaro.desenho[3][1] = '#';
         }
-        if (passaro.nivel_evolucao >= 1) {  // Nível 1: ##
-            passaro.desenho[1][2] = '#';
-            passaro.desenho[1][3] = '#';
+        if (passaro.nivel_evolucao >= 1) {   // Nível 1: segundo # da linha 3
+            passaro.desenho[3][1] = '#';
+            passaro.desenho[3][2] = '#';
         }
-        if (passaro.nivel_evolucao >= 2) {  // Nível 2: ###
-            passaro.desenho[1][2] = '#';
-            passaro.desenho[1][3] = '#';
-            passaro.desenho[1][4] = '#';
+        if (passaro.nivel_evolucao >= 2) {   // Nível 2: terceiro # da linha 3
+            passaro.desenho[3][1] = '#';
+            passaro.desenho[3][2] = '#';
+            passaro.desenho[3][3] = '#';
         }
-        if (passaro.nivel_evolucao >= 3) {  // Nível 3: ### + #
-            passaro.desenho[1][2] = '#';
-            passaro.desenho[1][3] = '#';
-            passaro.desenho[1][4] = '#';
-            passaro.desenho[0][2] = '#';
+        if (passaro.nivel_evolucao >= 3) {   // Nível 3: primeiro # da linha 2
+            passaro.desenho[3][1] = '#';
+            passaro.desenho[3][2] = '#';
+            passaro.desenho[3][3] = '#';
+            passaro.desenho[2][0] = '#';
         }
-        if (passaro.nivel_evolucao >= 4) {  // Nível 4: ### + ##
-            passaro.desenho[1][2] = '#';
-            passaro.desenho[1][3] = '#';
-            passaro.desenho[1][4] = '#';
-            passaro.desenho[0][2] = '#';
-            passaro.desenho[0][3] = '#';
+        if (passaro.nivel_evolucao >= 4) {   // Nível 4: segundo # da linha 2
+            passaro.desenho[3][1] = '#';
+            passaro.desenho[3][2] = '#';
+            passaro.desenho[3][3] = '#';
+            passaro.desenho[2][0] = '#';
+            passaro.desenho[2][1] = '#';
         }
-        if (passaro.nivel_evolucao >= 5) {  // Nível 5: ### + ###
-            passaro.desenho[1][2] = '#';
-            passaro.desenho[1][3] = '#';
-            passaro.desenho[1][4] = '#';
-            passaro.desenho[0][2] = '#';
-            passaro.desenho[0][3] = '#';
-            passaro.desenho[0][4] = '#';
+        if (passaro.nivel_evolucao >= 5) {   // Nível 5: terceiro # da linha 2
+            passaro.desenho[3][1] = '#';
+            passaro.desenho[3][2] = '#';
+            passaro.desenho[3][3] = '#';
+            passaro.desenho[2][0] = '#';
+            passaro.desenho[2][1] = '#';
+            passaro.desenho[2][2] = '#';
         }
-        if (passaro.nivel_evolucao >= 6) {  // Nível 6: #### + ###
-            passaro.desenho[1][1] = '#';
-            passaro.desenho[1][2] = '#';
-            passaro.desenho[1][3] = '#';
-            passaro.desenho[1][4] = '#';
-            passaro.desenho[0][2] = '#';
-            passaro.desenho[0][3] = '#';
-            passaro.desenho[0][4] = '#';
-        }
-        if (passaro.nivel_evolucao >= 7) {  // Nível 7: #### + # + ###
-            passaro.desenho[1][1] = '#';
-            passaro.desenho[1][2] = '#';
-            passaro.desenho[1][3] = '#';
-            passaro.desenho[1][4] = '#';
-            passaro.desenho[0][0] = '#';
+        if (passaro.nivel_evolucao >= 6) {   // Nível 6: quarto # da linha 2
+            passaro.desenho[3][1] = '#';
+            passaro.desenho[3][2] = '#';
+            passaro.desenho[3][3] = '#';
+            passaro.desenho[2][0] = '#';
+            passaro.desenho[2][1] = '#';
             passaro.desenho[2][2] = '#';
             passaro.desenho[2][3] = '#';
-            passaro.desenho[2][4] = '#';
         }
-        if (passaro.nivel_evolucao >= 8) {  // Nível 8: #### + ## + ###
+        if (passaro.nivel_evolucao >= 7) {   // Nível 7: primeiro # da linha 1
+            passaro.desenho[3][1] = '#';
+            passaro.desenho[3][2] = '#';
+            passaro.desenho[3][3] = '#';
+            passaro.desenho[2][0] = '#';
+            passaro.desenho[2][1] = '#';
+            passaro.desenho[2][2] = '#';
+            passaro.desenho[2][3] = '#';
+            passaro.desenho[1][1] = '#';
+        }
+        if (passaro.nivel_evolucao >= 8) {   // Nível 8: segundo # da linha 1
+            passaro.desenho[3][1] = '#';
+            passaro.desenho[3][2] = '#';
+            passaro.desenho[3][3] = '#';
+            passaro.desenho[2][0] = '#';
+            passaro.desenho[2][1] = '#';
+            passaro.desenho[2][2] = '#';
+            passaro.desenho[2][3] = '#';
+            passaro.desenho[1][1] = '#';
+            passaro.desenho[1][2] = '#';
+        }
+        if (passaro.nivel_evolucao >= 9) {   // Nível 9: terceiro # da linha 1
+            passaro.desenho[3][1] = '#';
+            passaro.desenho[3][2] = '#';
+            passaro.desenho[3][3] = '#';
+            passaro.desenho[2][0] = '#';
+            passaro.desenho[2][1] = '#';
+            passaro.desenho[2][2] = '#';
+            passaro.desenho[2][3] = '#';
             passaro.desenho[1][1] = '#';
             passaro.desenho[1][2] = '#';
             passaro.desenho[1][3] = '#';
-            passaro.desenho[1][4] = '#';
-            passaro.desenho[0][0] = '#';
+        }
+        if (passaro.nivel_evolucao >= 10) {  // Nível 10: primeiro # da linha 0 (cima)
+            passaro.desenho[3][1] = '#';
+            passaro.desenho[3][2] = '#';
+            passaro.desenho[3][3] = '#';
+            passaro.desenho[2][0] = '#';
+            passaro.desenho[2][1] = '#';
+            passaro.desenho[2][2] = '#';
+            passaro.desenho[2][3] = '#';
+            passaro.desenho[1][1] = '#';
+            passaro.desenho[1][2] = '#';
+            passaro.desenho[1][3] = '#';
             passaro.desenho[0][1] = '#';
+        }
+        if (passaro.nivel_evolucao >= 11) {  // Nível 11: segundo # da linha 0
+            passaro.desenho[3][1] = '#';
+            passaro.desenho[3][2] = '#';
+            passaro.desenho[3][3] = '#';
+            passaro.desenho[2][0] = '#';
+            passaro.desenho[2][1] = '#';
             passaro.desenho[2][2] = '#';
             passaro.desenho[2][3] = '#';
-            passaro.desenho[2][4] = '#';
+            passaro.desenho[1][1] = '#';
+            passaro.desenho[1][2] = '#';
+            passaro.desenho[1][3] = '#';
+            passaro.desenho[0][1] = '#';
+            passaro.desenho[0][2] = '#';
+        }
+        if (passaro.nivel_evolucao >= 12) {  // Nível 12: terceiro caractere da linha 0 (>)
+            passaro.desenho[3][1] = '#';
+            passaro.desenho[3][2] = '#';
+            passaro.desenho[3][3] = '#';
+            passaro.desenho[2][0] = '#';
+            passaro.desenho[2][1] = '#';
+            passaro.desenho[2][2] = '#';
+            passaro.desenho[2][3] = '#';
+            passaro.desenho[1][1] = '#';
+            passaro.desenho[1][2] = '#';
+            passaro.desenho[1][3] = '#';
+            passaro.desenho[0][1] = '#';
+            passaro.desenho[0][2] = '#';
+            passaro.desenho[0][3] = '>';
         }
     }
 }
@@ -231,8 +290,8 @@ void inicializar_jogo() {
 }
 
 void desenhar_passaro() {
-    // Desenhar o pássaro completo (3x6)
-    for (int i = 0; i < 3; i++) {
+    // Desenhar o pássaro completo (4x6)
+    for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 6; j++) {
             int y = passaro.y - 1 + i;  // Centralizar verticalmente
             int x = passaro.x - 2 + j;  // Centralizar horizontalmente
@@ -281,9 +340,19 @@ void atualizar_passaro() {
         if (passaro.y <= 0 || passaro.y >= ALTURA_TELA-1) {
             game_over = 1;
         }
+    } else if (passaro.nivel_evolucao <= 2) {
+        // Níveis 1-2: Pássaro pequeno (1x2 ou 1x3)
+        if (passaro.y <= 0 || passaro.y >= ALTURA_TELA-1) {
+            game_over = 1;
+        }
+    } else if (passaro.nivel_evolucao <= 6) {
+        // Níveis 3-6: Pássaro médio (2x4)
+        if (passaro.y <= 0 || passaro.y + 1 >= ALTURA_TELA-1) {
+            game_over = 1;
+        }
     } else {
-        // Níveis 1+: Pássaro completo (3x6)
-        if (passaro.y - 1 <= 0 || passaro.y + 1 >= ALTURA_TELA-1) {
+        // Níveis 7+: Pássaro completo (4x6)
+        if (passaro.y - 1 <= 0 || passaro.y + 2 >= ALTURA_TELA-1) {
             game_over = 1;
         }
     }
@@ -328,33 +397,39 @@ void atualizar_obstaculos() {
             passaro_right = passaro.x;
             passaro_top = passaro.y;
             passaro_bottom = passaro.y;
+        } else if (passaro.nivel_evolucao <= 2) {
+            // Níveis 1-2: Pássaro pequeno (1x2 ou 1x3)
+            passaro_left = passaro.x - 1;
+            passaro_right = passaro.x + 1;
+            passaro_top = passaro.y;
+            passaro_bottom = passaro.y;
+        } else if (passaro.nivel_evolucao <= 6) {
+            // Níveis 3-6: Pássaro médio (2x4)
+            passaro_left = passaro.x - 1;
+            passaro_right = passaro.x + 2;
+            passaro_top = passaro.y;
+            passaro_bottom = passaro.y + 1;
         } else {
-            // Níveis 1+: Pássaro completo (3x6)
+            // Níveis 7+: Pássaro completo (4x6)
             passaro_left = passaro.x - 2;
             passaro_right = passaro.x + 3;
             passaro_top = passaro.y - 1;
-            passaro_bottom = passaro.y + 1;
+            passaro_bottom = passaro.y + 2;
         }
         
-        // Verificar se há sobreposição horizontal (com margem de segurança nas bordas)
-        int margem_seguranca = 1; // Margem de 1 caractere nas bordas dos obstáculos
-        int obstaculo_left = obstaculos[i].x + margem_seguranca;
-        int obstaculo_right = obstaculos[i].x + LARGURA_OBSTACULO - margem_seguranca;
-        
-        if (passaro_right >= obstaculo_left && passaro_left < obstaculo_right) {
-            // Verificar colisão com obstáculo superior (ignorando bordas)
-            // Obstáculo superior ocupa de y=1 até y=altura_superior-1
-            // Colisão se: passaro_bottom >= 1 E passaro_top < altura_superior (com margem)
-            int altura_superior_com_margem = obstaculos[i].altura_superior - margem_seguranca;
-            if (passaro_bottom >= 1 + margem_seguranca && passaro_top < altura_superior_com_margem) {
+        // Verificar se há sobreposição horizontal
+        if (passaro_right >= obstaculos[i].x && passaro_left < obstaculos[i].x + LARGURA_OBSTACULO) {
+            // Verificar colisão com obstáculo superior
+            // Obstáculo superior vai de y=1 até y=altura_superior-1
+            // Colisão apenas se o pássaro está realmente tocando o obstáculo
+            if (passaro_bottom >= 1 && passaro_top <= obstaculos[i].altura_superior - 1) {
                 game_over = 1;
             }
-            // Verificar colisão com obstáculo inferior (ignorando bordas)
-            // Obstáculo inferior ocupa de y=ALTURA_TELA-altura_inferior até y=ALTURA_TELA-2
-            // Colisão se: passaro_top < ALTURA_TELA-1 E passaro_bottom >= obstaculo_inferior_top (com margem)
+            // Verificar colisão com obstáculo inferior
+            // Obstáculo inferior vai de y=ALTURA_TELA-altura_inferior até y=ALTURA_TELA-2
+            // Colisão apenas se o pássaro está realmente tocando o obstáculo
             int obstaculo_inferior_top = ALTURA_TELA - obstaculos[i].altura_inferior;
-            int obstaculo_inferior_top_com_margem = obstaculo_inferior_top + margem_seguranca;
-            if (passaro_top < ALTURA_TELA-1 - margem_seguranca && passaro_bottom >= obstaculo_inferior_top_com_margem) {
+            if (passaro_top <= ALTURA_TELA - 2 && passaro_bottom >= obstaculo_inferior_top) {
                 game_over = 1;
             }
         }
