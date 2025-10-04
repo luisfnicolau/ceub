@@ -1,26 +1,20 @@
-# Makefile para Flappy Bird Terminal
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c99 -O2
 TARGET = flappy_bird
 SOURCE = flappy_bird.c
 
-# Regra principal
 $(TARGET): $(SOURCE)
 	$(CC) $(CFLAGS) -o $(TARGET) $(SOURCE)
 
-# Regra para limpeza
 clean:
 	rm -f $(TARGET)
 
-# Regra para executar
 run: $(TARGET)
 	./$(TARGET)
 
-# Regra para debug
 debug: CFLAGS += -g -DDEBUG
 debug: $(TARGET)
 
-# Regra para instalar dependências (se necessário)
 install:
 	@echo "Dependências do sistema necessárias:"
 	@echo "- gcc (compilador C)"

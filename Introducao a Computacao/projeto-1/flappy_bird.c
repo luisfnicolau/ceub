@@ -6,23 +6,23 @@
 #include <time.h>
 #include <sys/select.h>
 
-// Configurações do jogo
 #define LARGURA_TELA 80
 #define ALTURA_TELA 20
 #define GRAVIDADE 0.1
 #define IMPULSO -0.3
 #define LARGURA_OBSTACULO 4
-#define VELOCIDADE_JOGO 0.5
-#define FPS_DELAY 33333  // Microssegundos (33ms = 30 FPS)
-#define PONTUACAO_PARA_PROXIMO_NIVEL 1
-#define MODO_INVENCIVEL 0  // Ativar modo invencível para testes
+#define VELOCIDADE_JOGO_BASE 1.0
+#define VELOCIDADE_JOGO_MAXIMA 2.0
+#define FPS_DELAY_BASE 33333
+#define FPS_DELAY_MINIMO 16666
+#define PONTUACAO_PARA_PROXIMO_NIVEL 2
+#define MODO_INVENCIVEL 0
 
-// Estruturas
 typedef struct {
     int x, y;
     float velocidade;
-    char desenho[4][6];  // Desenho ASCII do pássaro (4 linhas x 6 colunas)
-    int nivel_evolucao;  // Nível de evolução baseado na pontuação
+    char desenho[4][6];
+    int nivel_evolucao;
 } Passaro;
 
 typedef struct {
@@ -37,15 +37,16 @@ typedef struct {
     char **buffer;
 } Tela;
 
-// Variáveis globais
 Passaro passaro;
 Obstaculo obstaculos[3];
 int pontuacao = 0;
 int game_over = 0;
 int jogo_iniciado = 0;
 Tela tela;
+float velocidade_jogo_atual = VELOCIDADE_JOGO_BASE;
+int fps_delay_atual = FPS_DELAY_BASE;
 
-// Funções de sistema
+// Configura o terminal para leitura de teclas sem pressionar Enter
 void configurar_terminal() {
     struct termios term;
     tcgetattr(STDIN_FILENO, &term);
@@ -53,6 +54,7 @@ void configurar_terminal() {
     tcsetattr(STDIN_FILENO, TCSANOW, &term);
 }
 
+// Restaura as configurações normais do terminal
 void restaurar_terminal() {
     struct termios term;
     tcgetattr(STDIN_FILENO, &term);
@@ -60,22 +62,25 @@ void restaurar_terminal() {
     tcsetattr(STDIN_FILENO, TCSANOW, &term);
 }
 
+// Limpa a tela do terminal usando sequências ANSI
 void limpar_tela() {
     fputs("\033[2J\033[H", stdout);
     fflush(stdout);
 }
 
+// Oculta o cursor do terminal
 void ocultar_cursor() {
     printf("\033[?25l");
     fflush(stdout);
 }
 
+// Mostra o cursor do terminal
 void mostrar_cursor() {
     printf("\033[?25h");
     fflush(stdout);
 }
 
-// Funções do jogo
+// Aloca memória para o buffer da tela e inicializa com espaços
 void inicializar_tela() {
     tela.largura = LARGURA_TELA;
     tela.altura = ALTURA_TELA;
@@ -88,6 +93,7 @@ void inicializar_tela() {
     }
 }
 
+// Libera a memória alocada para o buffer da tela
 void liberar_tela() {
     for (int i = 0; i < ALTURA_TELA; i++) {
         free(tela.buffer[i]);
@@ -95,84 +101,95 @@ void liberar_tela() {
     free(tela.buffer);
 }
 
+// Limpa o buffer da tela preenchendo com espaços
 void limpar_buffer() {
     for (int i = 0; i < ALTURA_TELA; i++) {
         memset(tela.buffer[i], ' ', LARGURA_TELA);
     }
 }
 
+// Desenha as bordas do jogo (superior, inferior e laterais)
 void desenhar_borda() {
-    // Borda superior e inferior
     for (int x = 0; x < LARGURA_TELA; x++) {
         tela.buffer[0][x] = '-';
         tela.buffer[ALTURA_TELA-1][x] = '-';
     }
     
-    // Bordas laterais
     for (int y = 0; y < ALTURA_TELA; y++) {
         tela.buffer[y][0] = '|';
         tela.buffer[y][LARGURA_TELA-1] = '|';
     }
 }
 
+// Inicializa o desenho do pássaro com apenas um '#' no nível 0
 void inicializar_desenho_passaro() {
-    // Limpar desenho inicial
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 6; j++) {
             passaro.desenho[i][j] = ' ';
         }
     }
     
-    // Nível 0: primeiro # da linha 3 (baixo)
     passaro.desenho[3][1] = '#';
     passaro.nivel_evolucao = 0;
 }
 
+// Calcula o delay do FPS baseado na evolução do pássaro para acelerar o jogo
+void calcular_fps_delay() {
+    int nivel_atual = pontuacao / PONTUACAO_PARA_PROXIMO_NIVEL;
+    
+    if (nivel_atual >= 12) {
+        int pontos_apos_completo = pontuacao - 12;
+        int decrementos = pontos_apos_completo / 2;
+        
+        fps_delay_atual = FPS_DELAY_BASE - (decrementos * 1000);
+        
+        if (fps_delay_atual < FPS_DELAY_MINIMO) {
+            fps_delay_atual = FPS_DELAY_MINIMO;
+        }
+    } else {
+        fps_delay_atual = FPS_DELAY_BASE;
+    }
+}
+
+// Atualiza o desenho do pássaro baseado na pontuação (evolução progressiva)
 void atualizar_desenho_passaro() {
-    int novo_nivel = pontuacao / PONTUACAO_PARA_PROXIMO_NIVEL;  // Novo nível baseado na pontuação
+    int novo_nivel = pontuacao / PONTUACAO_PARA_PROXIMO_NIVEL;
     
     if (novo_nivel != passaro.nivel_evolucao) {
         passaro.nivel_evolucao = novo_nivel;
         
-        // Limpar desenho anterior
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 6; j++) {
                 passaro.desenho[i][j] = ' ';
             }
         }
         
-        // Progressão:  ##>   (linha 0 - cima)
-        //              ###   (linha 1)  
-        //              ####  (linha 2)
-        //              ###   (linha 3 - baixo)
-        
-        // Desenhar de baixo para cima, esquerda para direita
-        if (passaro.nivel_evolucao >= 0) {   // Nível 0: primeiro # da linha 3 (baixo)
+        if (passaro.nivel_evolucao >= 0) {
             passaro.desenho[3][1] = '#';
         }
-        if (passaro.nivel_evolucao >= 1) {   // Nível 1: segundo # da linha 3
+        if (passaro.nivel_evolucao >= 1) {
             passaro.desenho[3][1] = '#';
             passaro.desenho[3][2] = '#';
         }
-        if (passaro.nivel_evolucao >= 2) {   // Nível 2: terceiro # da linha 3
+        if (passaro.nivel_evolucao >= 2) {
             passaro.desenho[3][1] = '#';
             passaro.desenho[3][2] = '#';
             passaro.desenho[3][3] = '#';
         }
-        if (passaro.nivel_evolucao >= 3) {   // Nível 3: primeiro # da linha 2
+        if (passaro.nivel_evolucao >= 3) {
             passaro.desenho[3][1] = '#';
             passaro.desenho[3][2] = '#';
             passaro.desenho[3][3] = '#';
             passaro.desenho[2][0] = '#';
         }
-        if (passaro.nivel_evolucao >= 4) {   // Nível 4: segundo # da linha 2
+        if (passaro.nivel_evolucao >= 4) {
             passaro.desenho[3][1] = '#';
             passaro.desenho[3][2] = '#';
             passaro.desenho[3][3] = '#';
             passaro.desenho[2][0] = '#';
             passaro.desenho[2][1] = '#';
         }
-        if (passaro.nivel_evolucao >= 5) {   // Nível 5: terceiro # da linha 2
+        if (passaro.nivel_evolucao >= 5) {
             passaro.desenho[3][1] = '#';
             passaro.desenho[3][2] = '#';
             passaro.desenho[3][3] = '#';
@@ -180,7 +197,7 @@ void atualizar_desenho_passaro() {
             passaro.desenho[2][1] = '#';
             passaro.desenho[2][2] = '#';
         }
-        if (passaro.nivel_evolucao >= 6) {   // Nível 6: quarto # da linha 2
+        if (passaro.nivel_evolucao >= 6) {
             passaro.desenho[3][1] = '#';
             passaro.desenho[3][2] = '#';
             passaro.desenho[3][3] = '#';
@@ -189,7 +206,7 @@ void atualizar_desenho_passaro() {
             passaro.desenho[2][2] = '#';
             passaro.desenho[2][3] = '#';
         }
-        if (passaro.nivel_evolucao >= 7) {   // Nível 7: primeiro # da linha 1
+        if (passaro.nivel_evolucao >= 7) {
             passaro.desenho[3][1] = '#';
             passaro.desenho[3][2] = '#';
             passaro.desenho[3][3] = '#';
@@ -199,7 +216,7 @@ void atualizar_desenho_passaro() {
             passaro.desenho[2][3] = '#';
             passaro.desenho[1][1] = '#';
         }
-        if (passaro.nivel_evolucao >= 8) {   // Nível 8: segundo # da linha 1
+        if (passaro.nivel_evolucao >= 8) {
             passaro.desenho[3][1] = '#';
             passaro.desenho[3][2] = '#';
             passaro.desenho[3][3] = '#';
@@ -210,7 +227,7 @@ void atualizar_desenho_passaro() {
             passaro.desenho[1][1] = '#';
             passaro.desenho[1][2] = '#';
         }
-        if (passaro.nivel_evolucao >= 9) {   // Nível 9: terceiro # da linha 1
+        if (passaro.nivel_evolucao >= 9) {
             passaro.desenho[3][1] = '#';
             passaro.desenho[3][2] = '#';
             passaro.desenho[3][3] = '#';
@@ -222,7 +239,7 @@ void atualizar_desenho_passaro() {
             passaro.desenho[1][2] = '#';
             passaro.desenho[1][3] = '#';
         }
-        if (passaro.nivel_evolucao >= 10) {  // Nível 10: primeiro # da linha 0 (cima)
+        if (passaro.nivel_evolucao >= 10) {
             passaro.desenho[3][1] = '#';
             passaro.desenho[3][2] = '#';
             passaro.desenho[3][3] = '#';
@@ -235,7 +252,7 @@ void atualizar_desenho_passaro() {
             passaro.desenho[1][3] = '#';
             passaro.desenho[0][1] = '#';
         }
-        if (passaro.nivel_evolucao >= 11) {  // Nível 11: segundo # da linha 0
+        if (passaro.nivel_evolucao >= 11) {
             passaro.desenho[3][1] = '#';
             passaro.desenho[3][2] = '#';
             passaro.desenho[3][3] = '#';
@@ -249,7 +266,7 @@ void atualizar_desenho_passaro() {
             passaro.desenho[0][1] = '#';
             passaro.desenho[0][2] = '#';
         }
-        if (passaro.nivel_evolucao >= 12) {  // Nível 12: terceiro caractere da linha 0 (>)
+        if (passaro.nivel_evolucao >= 12) {
             passaro.desenho[3][1] = '#';
             passaro.desenho[3][2] = '#';
             passaro.desenho[3][3] = '#';
@@ -267,20 +284,18 @@ void atualizar_desenho_passaro() {
     }
 }
 
+// Inicializa todas as variáveis do jogo para um novo jogo
 void inicializar_jogo() {
-    // Inicializar pássaro
     passaro.x = 10;
     passaro.y = ALTURA_TELA / 2;
     passaro.velocidade = 0;
     inicializar_desenho_passaro();
     
-    // Inicializar obstáculos
     srand(time(NULL));
     for (int i = 0; i < 3; i++) {
         obstaculos[i].x = LARGURA_TELA + (i * 25);
-        // Garantir que sempre há um espaço de 8 linhas entre os obstáculos
         int espaco_obstaculos = 8;
-        int altura_maxima_superior = ALTURA_TELA - espaco_obstaculos - 2; // -2 para bordas
+        int altura_maxima_superior = ALTURA_TELA - espaco_obstaculos - 2;
         obstaculos[i].altura_superior = rand() % altura_maxima_superior + 1;
         obstaculos[i].altura_inferior = ALTURA_TELA - obstaculos[i].altura_superior - espaco_obstaculos;
         obstaculos[i].passou = 0;
@@ -288,14 +303,16 @@ void inicializar_jogo() {
     
     pontuacao = 0;
     game_over = 0;
+    velocidade_jogo_atual = VELOCIDADE_JOGO_BASE;
+    fps_delay_atual = FPS_DELAY_BASE;
 }
 
+// Desenha o pássaro no buffer da tela usando seu desenho ASCII
 void desenhar_passaro() {
-    // Desenhar o pássaro completo (4x6)
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 6; j++) {
-            int y = passaro.y - 1 + i;  // Centralizar verticalmente
-            int x = passaro.x - 2 + j;  // Centralizar horizontalmente
+            int y = passaro.y - 1 + i;
+            int x = passaro.x - 2 + j;
             
             if (y >= 1 && y < ALTURA_TELA-1 && 
                 x >= 1 && x < LARGURA_TELA-1 && 
@@ -306,10 +323,10 @@ void desenhar_passaro() {
     }
 }
 
+// Desenha todos os obstáculos (superior e inferior) no buffer da tela
 void desenhar_obstaculos() {
     for (int i = 0; i < 3; i++) {
         if (obstaculos[i].x >= 0 && obstaculos[i].x < LARGURA_TELA) {
-            // Obstáculo superior
             for (int y = 1; y < obstaculos[i].altura_superior; y++) {
                 for (int x = obstaculos[i].x; x < obstaculos[i].x + LARGURA_OBSTACULO && x < LARGURA_TELA-1; x++) {
                     if (x >= 1) {
@@ -318,7 +335,6 @@ void desenhar_obstaculos() {
                 }
             }
             
-            // Obstáculo inferior
             for (int y = ALTURA_TELA - obstaculos[i].altura_inferior; y < ALTURA_TELA-1; y++) {
                 for (int x = obstaculos[i].x; x < obstaculos[i].x + LARGURA_OBSTACULO && x < LARGURA_TELA-1; x++) {
                     if (x >= 1) {
@@ -330,30 +346,25 @@ void desenhar_obstaculos() {
     }
 }
 
+// Aplica a física do pássaro (gravidade e movimento) e verifica colisões com bordas
 void atualizar_passaro() {
-    // Aplicar gravidade
     passaro.velocidade += GRAVIDADE;
     passaro.y += passaro.velocidade;
     
-    // Verificar colisões com bordas (hitbox baseada no nível de evolução)
 #if !MODO_INVENCIVEL
     if (passaro.nivel_evolucao == 0) {
-        // Nível 0: Apenas um # (1x1)
         if (passaro.y <= 0 || passaro.y >= ALTURA_TELA-1) {
             game_over = 1;
         }
     } else if (passaro.nivel_evolucao <= 2) {
-        // Níveis 1-2: Pássaro pequeno (1x2 ou 1x3)
         if (passaro.y <= 0 || passaro.y >= ALTURA_TELA-1) {
             game_over = 1;
         }
     } else if (passaro.nivel_evolucao <= 6) {
-        // Níveis 3-6: Pássaro médio (2x4)
         if (passaro.y <= 0 || passaro.y + 1 >= ALTURA_TELA-1) {
             game_over = 1;
         }
     } else {
-        // Níveis 7+: Pássaro completo (4x6)
         if (passaro.y - 1 <= 0 || passaro.y + 2 >= ALTURA_TELA-1) {
             game_over = 1;
         }
@@ -361,11 +372,13 @@ void atualizar_passaro() {
 #endif
 }
 
+// Move os obstáculos, calcula FPS delay, pontuação e verifica colisões
 void atualizar_obstaculos() {
     static int contador = 0;
     contador++;
     
-    // Mover obstáculos apenas a cada 2 frames (velocidade reduzida)
+    calcular_fps_delay();
+    
     if (contador >= 2) {
         contador = 0;
         for (int i = 0; i < 3; i++) {
@@ -374,65 +387,50 @@ void atualizar_obstaculos() {
     }
     
     for (int i = 0; i < 3; i++) {
-        // Verificar se passou do pássaro para pontuar
         if (obstaculos[i].x + LARGURA_OBSTACULO < passaro.x && !obstaculos[i].passou) {
             pontuacao++;
             obstaculos[i].passou = 1;
         }
         
-        // Reposicionar obstáculo quando sair da tela
         if (obstaculos[i].x + LARGURA_OBSTACULO < 0) {
             obstaculos[i].x = LARGURA_TELA + 10;
-            // Manter o mesmo espaço de 8 linhas entre os obstáculos
             int espaco_obstaculos = 8;
-            int altura_maxima_superior = ALTURA_TELA - espaco_obstaculos - 2; // -2 para bordas
+            int altura_maxima_superior = ALTURA_TELA - espaco_obstaculos - 2;
             obstaculos[i].altura_superior = rand() % altura_maxima_superior + 1;
             obstaculos[i].altura_inferior = ALTURA_TELA - obstaculos[i].altura_superior - espaco_obstaculos;
             obstaculos[i].passou = 0;
         }
         
-        // Verificar colisão com pássaro (hitbox baseada no nível de evolução)
         int passaro_left, passaro_right, passaro_top, passaro_bottom;
         
         if (passaro.nivel_evolucao == 0) {
-            // Nível 0: Apenas um # (1x1)
             passaro_left = passaro.x;
             passaro_right = passaro.x;
             passaro_top = passaro.y;
             passaro_bottom = passaro.y;
         } else if (passaro.nivel_evolucao <= 2) {
-            // Níveis 1-2: Pássaro pequeno (1x2 ou 1x3)
             passaro_left = passaro.x - 1;
             passaro_right = passaro.x + 1;
             passaro_top = passaro.y;
             passaro_bottom = passaro.y;
         } else if (passaro.nivel_evolucao <= 6) {
-            // Níveis 3-6: Pássaro médio (2x4)
             passaro_left = passaro.x - 1;
             passaro_right = passaro.x + 2;
             passaro_top = passaro.y;
             passaro_bottom = passaro.y + 1;
         } else {
-            // Níveis 7+: Pássaro completo (4x6)
             passaro_left = passaro.x - 2;
             passaro_right = passaro.x + 3;
             passaro_top = passaro.y - 1;
             passaro_bottom = passaro.y + 2;
         }
         
-        // Verificar se há sobreposição horizontal
         if (passaro_right >= obstaculos[i].x && passaro_left < obstaculos[i].x + LARGURA_OBSTACULO) {
-            // Verificar colisão com obstáculo superior
-            // Obstáculo superior vai de y=1 até y=altura_superior-1
-            // Colisão apenas se o pássaro está realmente tocando o obstáculo
             if (passaro_bottom >= 1 && passaro_top <= obstaculos[i].altura_superior - 1) {
 #if !MODO_INVENCIVEL
                 game_over = 1;
 #endif
             }
-            // Verificar colisão com obstáculo inferior
-            // Obstáculo inferior vai de y=ALTURA_TELA-altura_inferior até y=ALTURA_TELA-2
-            // Colisão apenas se o pássaro está realmente tocando o obstáculo
             int obstaculo_inferior_top = ALTURA_TELA - obstaculos[i].altura_inferior;
             if (passaro_top <= ALTURA_TELA - 2 && passaro_bottom >= obstaculo_inferior_top) {
 #if !MODO_INVENCIVEL
@@ -443,13 +441,16 @@ void atualizar_obstaculos() {
     }
 }
 
+// Desenha a interface do jogo (pontuação, menu inicial, game over)
 void desenhar_interface() {
-    // Desenhar pontuação e nível de evolução
-    char pontuacao_str[50];
+    char pontuacao_str[60];
 #if MODO_INVENCIVEL
-    snprintf(pontuacao_str, sizeof(pontuacao_str), "Score: %d | Nivel: %d | [INVENCIVEL]", pontuacao, passaro.nivel_evolucao);
+    int fps_atual = 1000000 / fps_delay_atual;
+    snprintf(pontuacao_str, sizeof(pontuacao_str), "Score: %d | Nivel: %d | FPS: %d | [INVENCIVEL]", 
+             pontuacao, passaro.nivel_evolucao, fps_atual);
 #else
-    snprintf(pontuacao_str, sizeof(pontuacao_str), "Score: %d | Nivel: %d", pontuacao, passaro.nivel_evolucao);
+    snprintf(pontuacao_str, sizeof(pontuacao_str), "Score: %d", 
+             pontuacao);
 #endif
     
     int len = strlen(pontuacao_str);
@@ -461,7 +462,6 @@ void desenhar_interface() {
         }
     }
     
-    // Desenhar menu inicial
     if (!jogo_iniciado) {
         char titulo[] = "=== FLAPPY TERMINAL ===";
         int len_titulo = strlen(titulo);
@@ -524,7 +524,6 @@ void desenhar_interface() {
         }
     }
     
-    // Desenhar game over
     if (game_over) {
         char game_over_text[] = "GAME OVER!";
         int len_go = strlen(game_over_text);
@@ -558,10 +557,10 @@ void desenhar_interface() {
     }
 }
 
+// Renderiza o buffer da tela no terminal
 void renderizar_tela() {
     limpar_tela();
     
-    // Renderizar todas as linhas de uma vez para melhor performance
     for (int y = 0; y < ALTURA_TELA; y++) {
         fputs(tela.buffer[y], stdout);
         fputs("\n", stdout);
@@ -569,6 +568,7 @@ void renderizar_tela() {
     fflush(stdout);
 }
 
+// Verifica se há uma tecla disponível para leitura (não bloqueante)
 int tecla_disponivel() {
     struct timeval tv;
     fd_set rdfs;
@@ -583,6 +583,7 @@ int tecla_disponivel() {
     return FD_ISSET(STDIN_FILENO, &rdfs);
 }
 
+// Lê uma tecla se disponível, senão retorna 0
 char ler_tecla() {
     if (tecla_disponivel()) {
         return getchar();
@@ -590,6 +591,7 @@ char ler_tecla() {
     return 0;
 }
 
+// Processa a entrada do usuário (teclas) baseado no estado do jogo
 void processar_input() {
     char tecla = ler_tecla();
     
@@ -612,18 +614,14 @@ void processar_input() {
     }
 }
 
+// Função principal - configura o jogo e executa o loop principal
 int main() {
-    // Configurar terminal
     configurar_terminal();
     ocultar_cursor();
     
-    // Inicializar jogo
     inicializar_tela();
     inicializar_jogo();
     
-    // Menu inicial será mostrado dentro do jogo
-    
-    // Loop principal do jogo
     while (1) {
         processar_input();
         
@@ -633,7 +631,6 @@ int main() {
             atualizar_desenho_passaro();
         }
         
-        // Renderizar
         limpar_buffer();
         desenhar_borda();
         
@@ -645,10 +642,9 @@ int main() {
         desenhar_interface();
         renderizar_tela();
         
-        usleep(FPS_DELAY);
+        usleep(fps_delay_atual);
     }
     
-    // Limpeza
     liberar_tela();
     mostrar_cursor();
     restaurar_terminal();

@@ -88,14 +88,6 @@ Você pode modificar as seguintes constantes para personalizar o jogo:
 #define FPS_DELAY 33333        // Delay entre frames (33ms = 30 FPS)
 ```
 
-### 🚀 Ajustes de Performance
-
-Para diferentes níveis de fluidez:
-
-- **30 FPS (Fluido)**: `FPS_DELAY 33333` (padrão atual)
-- **20 FPS (Equilibrado)**: `FPS_DELAY 50000`
-- **60 FPS (Muito fluido)**: `FPS_DELAY 16666` (pode ser muito rápido)
-- **10 FPS (Lento)**: `FPS_DELAY 100000`
 
 ## 🐛 Resolução de Problemas
 
@@ -111,15 +103,6 @@ Para diferentes níveis de fluidez:
 - Certifique-se de pressionar ESPAÇO para iniciar
 - O jogo pode parecer travado se não houver input
 
-## 📝 Notas de Desenvolvimento
-
-Este jogo foi desenvolvido como projeto de introdução à computação, demonstrando:
-- Programação em C
-- Manipulação de terminal
-- Estruturas de dados
-- Lógica de jogos
-- Interface de usuário em terminal
-
 ---
 
-**Divirta-se jogando! 🎮**
+**Divirta-se! 🎮**
