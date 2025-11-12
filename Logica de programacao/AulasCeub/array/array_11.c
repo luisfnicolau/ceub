@@ -14,5 +14,5 @@ void main(void) {
 	qtd=atoi(gets(aux));
 	printf("\n Digite o valor do produto: ");
 	valor = atof(gets(aux));
-	printf("\n O valor a ser pago pelo produto %s será de R$ %.2f", prod, qtd*valors);
+	printf("\n O valor a ser pago pelo produto %s será de R$ %.2f", prod, qtd*valor);
 }
