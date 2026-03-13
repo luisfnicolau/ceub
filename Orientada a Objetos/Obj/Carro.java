@@ -2,7 +2,7 @@ public class Carro {
     //Atributos (variáveis)
     private String marca;
     private String modelo;
-    private int ano;
+    int ano;
     private double velocidadeMaxima;
     private boolean automatico;
 
