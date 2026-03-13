@@ -63,7 +63,7 @@ public class Main {
 
 
         for (int i = 0; i < qtdNum; i++) {
-            System.out.println("Digite um número: ");
+            System.out.println("Digite o número " + (i + 1) + ":");
             float num = sc.nextFloat();
             somatorio += num;
         }

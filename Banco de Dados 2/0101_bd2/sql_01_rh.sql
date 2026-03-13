@@ -1,6 +1,9 @@
 -- Exercicio de DDL
 -- 23-02-2026
 
+-- 0. Apagar bd antigo
+-- DROP DATABASE bd_rh_0101;
+
 -- 1. Criar o banco de dados
 CREATE DATABASE bd_rh_0101;
 
