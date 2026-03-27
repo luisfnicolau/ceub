@@ -3,7 +3,8 @@ public class Main {
         // Chamada metodo constutor
         Carro carro_1 = new Carro(null, null, 0);
         carro_1.acelerar();
-        System.out.println(carro_1.mostrarMarca());
-        System.out.println(carro_1.ano);
+        carro_1.mostrarInfo();
+        carro_1.getAno();
+        carro_1.setAno(2026);
     }
 }

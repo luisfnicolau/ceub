@@ -21,9 +21,26 @@ public class Carro {
         System.out.println("VRUUUMMMM!!");
     }
 
+    public int getAno() {
+        return this.ano;
+    }
+
+    public void setAno(int novoAno) {
+        this.ano = novoAno;
+    }
+
 
     //Com retorno
-    public String mostrarMarca() {
+    private String mostrarMarca() {
         return this.marca;
+    }
+
+    public void mostrarInfo() {
+        System.out.println("Marca: " + this.mostrarMarca());
+        System.out.println("Modelo: " + this.modelo);
+        System.out.println("Ano de Fabricação: " + this.ano);
+        System.out.println("Velocidade Máxima: " + this.velocidadeMaxima);
+        System.out.println("Automático: " + this.automatico);
+
     }
 }
