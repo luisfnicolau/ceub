@@ -5,5 +5,10 @@ public class Main {
         Animal animal = new Animal("Jorge", 12);
         animal.emitirSom();
         animal.mostrarInfo();
+
+        Cachorro cachorro = new Cachorro("Toto", 10, "Golden");
+        cachorro.emitirSom();
+        cachorro.abanarCauda();
+        cachorro.mostrarInfo();
     }    
 }
