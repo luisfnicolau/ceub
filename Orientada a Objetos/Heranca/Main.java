@@ -10,5 +10,8 @@ public class Main {
         cachorro.emitirSom();
         cachorro.abanarCauda();
         cachorro.mostrarInfo();
+
+        Gato gato = new Gato("Furry", 4);
+        gato.emitirSom();
     }    
 }
