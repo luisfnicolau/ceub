@@ -18,6 +18,10 @@ public abstract class Veiculo {
     }
 
     public void desacelerar(double drecremento){
+        if (nome == "Opala") {
+            System.out.println("Opala não freia");
+            return;
+        }
         if(drecremento > 0){
             velocidade -= drecremento;
             if(velocidade < 0){

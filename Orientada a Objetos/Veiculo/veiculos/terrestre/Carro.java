@@ -1,6 +1,7 @@
 package veiculos.terrestre;
 
 public class Carro extends Terrestre{
+    
     protected String tipoCombustivel;
 
     public Carro(String nome, int numeroRodas,String tipoCombustivel){
