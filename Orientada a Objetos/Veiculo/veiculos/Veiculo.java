@@ -32,5 +32,7 @@ public abstract class Veiculo {
 
     public void mostrarInfo() {
         System.out.println("Nome: " + nome);
+        System.out.println("Velocidade: "+velocidade);
+
     }
 }

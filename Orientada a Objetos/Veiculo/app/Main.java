@@ -1,12 +1,19 @@
 package app;
 
-import carros.Carro;
+import veiculos.terrestre.Carro;
 
 public class Main {
     public static void main(String[] args) {
-        Carro veiculo_1 = new Carro("Audi");
+        Carro opalao = new Carro("Opala", 4 "Gasolina");
 
-        veiculo_1.mover();
-
+        opalao.acelerar(120);
+        opalao.mover();
+        opalao.desacelerar(5);
+        opalao.mover();
     }    
 }
+
+/* acelerar
+mover
+desacelerar
+mover */
